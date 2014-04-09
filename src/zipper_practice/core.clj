@@ -38,6 +38,28 @@
   (println
     "Path is\n" (with-out-str (pprint (second location)))))
 
+(defn divisors
+  "Return a lazy seq of integers that exactly divide n, in order from
+  largest to smallest.
+
+  This function uses a stupidly naive brute-force approach."
+  [n]
+  (when-not (and (integer? n) (pos? n))
+    (throw
+      (IllegalArgumentException. "n must be a positive integer")))
+  (filter #(integer? (/ n %)) (range n 0 -1)))
+
+(defn divisors-tree-zipper
+  "Return a zipper to traverse an infinite lazy tree of integer divisors
+  of n."
+  [n]
+  (zip/zipper
+    (constantly true) ; branch? function
+    divisors ; children function
+    (fn [_ _] ; make-node function
+      (throw (UnsupportedOperationException. "This tree is read-only")))
+    n)) ; root is just the integer n
+
 (defn -main
   [& _]
   (println)
