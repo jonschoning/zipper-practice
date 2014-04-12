@@ -11,6 +11,8 @@
   symbols"
   (list (list 'a '* 'b) '+ (list 'c '* 'd)))
 
+
+
 (defn parse-xml-resource
   "Parse a XML resource to Clojure data structures."
   [n]
@@ -88,3 +90,22 @@
           (print-location new-location)
           (recur new-location (next steps)))
         (println "Final modified result is" (zip/root location))))))
+
+
+(defn drop-email-zip [x]
+  "removes all email nodes from an xml zipper"
+  (if (zip/end? x) 
+    (zip/root x)
+    (recur (-> (drop-email x) (zip/next)))))
+
+(defn drop-email [x]
+  "remove email node from current focus of an xml zipper"
+  (if (= :email (get (first x) :tag))
+   (zip/remove x)
+   x))
+
+(def sample-xml-zipper
+  (zip/xml-zip (parse-xml-resource "../resources/sample.xml")))
+
+(def modified-xml-zipper 
+  (drop-email-zip sample-xml-zipper))
